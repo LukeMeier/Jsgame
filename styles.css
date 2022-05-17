@@ -1,0 +1,13 @@
+canvas {
+    background-color: lightgray;
+    border: 10px;
+    border-color: black;
+}
+div {
+    display: flex;
+    padding: 0;
+    margin: 0;
+}
+#energycounter {
+    margin-bottom: 0;
+}
