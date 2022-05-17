@@ -1,8 +1,11 @@
 
 var myGamePiece;
 
+var colors = ["green", "red", "blue", "yellow", "gold", "black", "white", "orange", "lightblue", "lightgreen"];
+var number = Math.floor(Math.random()*colors.length)
+
 function startGame() {
-    myGamePiece = new component(30, 30, "red", 80, 75);
+    myGamePiece = new component(30, 30, colors[number], 80, 75);
     myGameArea.start();
 }
 
@@ -13,11 +16,11 @@ var myGameArea = {
         this.canvas.height = 635;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-        this.interval = setInterval(updateGameArea, 20);        
+        this.interval = setInterval(updateGameArea, 20);
     },
     stop : function() {
         clearInterval(this.interval);
-    },    
+    },
     clear : function() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
@@ -82,11 +85,6 @@ function desingupdate () {
     var ec = document.getElementById("energycounter");
     hc.removeAttributeNode;
     ec.removeAttributeNode;
-    // var ht = document.createTextNode(myGamePiece.health)
-    // var et = document.createTextNode(myGamePiece.energy)
-    // hc.appendChild(ht);
-    // ec.appendChild(et);
-
     hc.innerHTML = myGamePiece.health;
     ec.innerHTML = myGamePiece.energy;
 }
@@ -149,7 +147,7 @@ function onDocumentKeyUp(event) {
     }
 }
  function fall() {
-     lever2 = false;
+    lever2 = false;
     myGamePiece.gravity = 0.1;
 }
 
@@ -159,7 +157,7 @@ function getData() {
         datasave = data;
     }
     data = data1 - data2;
-    data2 = myGamePiece.y;    
+    data2 = myGamePiece.y;
 }
 setTimeout(lateinterval, 200)
 function lateinterval(){
@@ -174,27 +172,26 @@ function checkenergie () {
         myGamePiece.energy =10;
     }
     data1 = myGamePiece.y;
-    
 }
 
- function outOfEnergie (){
-     lever2 = false;
-     lever = false;
-     myGamePiece.gravity = 0.1;
-     while(myGamePiece.energy > 0 && lever2 == false) {
+function outOfEnergie (){
+    lever2 = false;
+    lever = false;
+    myGamePiece.gravity = 0.1;
+    while(myGamePiece.energy > 0 && lever2 == false) {
         setTimeout(energygain, 800);
     }
- }
- function moveleft() {
-    myGamePiece.speedX = -5; 
+}
+function moveleft() {
+    myGamePiece.speedX = -5;
 }
 
 function moveright() {
-    myGamePiece.speedX = 5; 
+    myGamePiece.speedX = 5;
 }
 function clearmove() {
-    myGamePiece.speedX = 0; 
-    myGamePiece.speedY = 0; 
+    myGamePiece.speedX = 0;
+    myGamePiece.speedY = 0;
 }
 
 
