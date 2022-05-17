@@ -59,6 +59,10 @@ function component(width, height, color, x, y, type) {
             lever = true;
             if (datasave > 25){
                 myGamePiece.health -= 15;
+                if (myGamePiece.health <= 0) {
+                    myGamePiece.health = 0;
+                    location.reload();
+                }
                 console.log(myGamePiece.health)
                 console.log(datasave)
                 datasave = 0;
