@@ -1,13 +1,27 @@
 
 var myGamePiece;
+var particles = [];
+var particleID = 0;
 
 var colors = ["green", "red", "blue", "yellow", "gold", "black", "white", "orange", "lightblue", "lightgreen"];
 var number = Math.floor(Math.random()*colors.length)
 
 function startGame() {
-    myGamePiece = new component(30, 30, colors[number], 80, 75);
+    myGamePiece = new component(30, 30, "red", 80, 75);
+    // var int = 0;
+    // setInterval(() => {
+    //     setTimeout(() => {
+    //         int++;
+    //         if(int > 20) return;
+    //         particleID++;
+    //         new component(10, 10, "orange", 80, 75, 5000, 1000, particleID); 
+    //     }, 10000);
+    // }, 100);
+    
     myGameArea.start();
 }
+
+console.log(particles)
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
@@ -26,10 +40,12 @@ var myGameArea = {
     }
 }
 
-function component(width, height, color, x, y, type) {
+function component(width, height, color, x, y, optionalFadeDelay, optionalFadeTime, particleID) {
+    this.id = particleID ?? 0;
     this.health = 100;
     this.energy = 10;
-    this.type = type;
+    this.color = color;
+    // this.type = type;
     this.width = width;
     this.height = height;
     this.x = x;
@@ -40,10 +56,36 @@ function component(width, height, color, x, y, type) {
     this.gravitySpeed = 0;
     this.seconds = 0;
     this.minuts = 0;
+
+    if(optionalFadeDelay && optionalFadeTime) {
+        this.color = `rgba(249, 180, 45, 1)`;
+        setTimeout(() => {
+            var ticks = optionalFadeTime / 20;
+            var doneTicks = 0;
+            fade();
+            function fade() {
+                setTimeout(() => {
+                    this.color = `rgba(249, 180, 45, ${Math.abs(doneTicks / ticks - 1)})`;
+                    doneTicks++;
+                    if(doneTicks > ticks) {
+                        if(particleID) {
+                            console.log(particles.filter(p => p.id === particleID)[0]);
+                            particles.splice(particles.findIndex(p => p.id === particleID),1);
+                            console.log(particles.filter(p => p.id === particleID)[0]);
+                        }
+                    }
+                    else {
+                        fade();
+                    }
+                }, 20);
+            }
+        }, optionalFadeDelay);
+    }
+
     this.update = function() {
         ctx = myGameArea.context;
-        ctx.fillStyle = color;
         ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fillStyle = this.color;
     }
     this.newPos = function() {
         this.gravitySpeed += this.gravity;
@@ -68,6 +110,10 @@ function component(width, height, color, x, y, type) {
                 datasave = 0;
             }
         }
+    }
+
+    if(particleID) {
+        particles.push(this);
     }
 }
 
@@ -97,6 +143,12 @@ function updateGameArea() {
     myGameArea.clear();
     myGamePiece.newPos();
     myGamePiece.update();
+
+    particles.forEach(particle => {
+        console.log(particle)
+        particle.newPos();
+        particle.update();
+    });
 }
 
 var lever2 = false;
@@ -197,5 +249,3 @@ function clearmove() {
     myGamePiece.speedX = 0;
     myGamePiece.speedY = 0;
 }
-
-
