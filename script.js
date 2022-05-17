@@ -53,7 +53,7 @@ function component(width, height, color, x, y, type) {
     }
     this.hitBottom = function() {
         var rockbottom = myGameArea.canvas.height - this.height;
-        if (this.y > rockbottom) {
+        if (this.y >= rockbottom) {
             this.y = rockbottom;
             this.gravitySpeed = 0;
             lever = true;
@@ -69,6 +69,9 @@ function component(width, height, color, x, y, type) {
             }
         }
     }
+    // this.hitBottom = function(){
+
+    // }
 }
 
 setInterval(desingupdate, 200)
