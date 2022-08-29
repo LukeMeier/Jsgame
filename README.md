@@ -1,2 +1,2 @@
 # Jsgame
-little JSgame
+litttle JSgame
