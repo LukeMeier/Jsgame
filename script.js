@@ -8,17 +8,16 @@ var number = Math.floor(Math.random()*colors.length)
 
 function startGame() {
     myGamePiece = new component(30, 30, "red", 80, 75);
-    // var int = 0;
-    // setInterval(() => {
-    //     setTimeout(() => {
-    //         int++;
-    //         if(int > 20) return;
-    //         particleID++;
-    //         new component(10, 10, "orange", 80, 75, 5000, 1000, particleID); 
-    //     }, 10000);
-    // }, 100);
-    
+    var int = 1;
     myGameArea.start();
+    setInterval(() => {
+        setTimeout(() => {
+            int++;
+            if(int > 20) return;
+            particleID++;
+            new component(10, 10, "red", 80, 75, 5000, 1000, particleID); 
+        }, 10000);
+    }, 100);
 }
 
 console.log(particles)
@@ -58,14 +57,14 @@ function component(width, height, color, x, y, optionalFadeDelay, optionalFadeTi
     this.minuts = 0;
 
     if(optionalFadeDelay && optionalFadeTime) {
-        this.color = `rgba(249, 180, 45, 1)`;
+        // this.color = `rgba(249, 180, 45, 1)`;
         setTimeout(() => {
             var ticks = optionalFadeTime / 20;
             var doneTicks = 0;
             fade();
             function fade() {
                 setTimeout(() => {
-                    this.color = `rgba(249, 180, 45, ${Math.abs(doneTicks / ticks - 1)})`;
+                    // this.color = `rgba(249, 180, 45, ${Math.abs(doneTicks / ticks - 1)})`;
                     doneTicks++;
                     if(doneTicks > ticks) {
                         if(particleID) {
