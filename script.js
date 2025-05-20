@@ -2,6 +2,10 @@ var myGamePiece;
 var particles = [];
 var particleID = 0;
 
+// Add this global variable to track the jetpack lean
+let jetpackLean = 0; // -1 (left), 0 (center), 1 (right)
+const jetpackLeanSpeed = 0.08; // How quickly the lean follows movement (0.08*20ms ≈ 0.5s)
+
 var colors = ["green", "red", "blue", "yellow", "gold", "black", "white", "orange", "lightblue", "lightgreen"];
 var number = Math.floor(Math.random()*colors.length)
 
@@ -133,22 +137,41 @@ function updateGameArea() {
     myGamePiece.newPos();
     myGamePiece.update();
 
+    // --- Jetpack lean logic ---
+    // Target lean: -1 for moving right, 1 for moving left, 0 for idle
+    let targetLean = 0;
+    if (myGamePiece.speedX > 0) targetLean = -1;
+    else if (myGamePiece.speedX < 0) targetLean = 1;
+    // Smoothly interpolate jetpackLean toward targetLean
+    jetpackLean += (targetLean - jetpackLean) * jetpackLeanSpeed;
+
     // Jetpack: spawn a particle under the player if flying up
     if (lever2 && myGamePiece.energy > 0) {
         particleID++;
-        // Randomize spread, speed, and rotation for fire effect
-        const spread = (Math.random() - 0.5) * myGamePiece.width * 0.8; // -12 to +12 if width=30
-        const speedX = (Math.random() - 0.5) * 2; // -1 to +1 px per tick
-        const speedY = Math.random() * 1.5 + 1; // 1 to 2.5 px per tick (downward)
+
+        // Make emission point closer to the edge (80% of half-width)
+        const edgeOffset = (myGamePiece.width * 0.8 / 2) * jetpackLean; // -12 to +12 if width=30
+        const baseX = myGamePiece.x + myGamePiece.width / 2 + edgeOffset;
+        const baseY = myGamePiece.y + myGamePiece.height;
+
+        // Increase spread angle to 80° for more sideways effect
+        const spreadAngle = (Math.PI / 2.25); // ~80°
+        const angleBase = Math.PI / 2 + jetpackLean * spreadAngle / 2; // Centered downward, shifted by lean
+        const angle = angleBase + (Math.random() - 0.5) * spreadAngle;
+
+        const speed = Math.random() * 1.5 + 1.2; // 1.2 to 2.7 px per tick
+        const speedX = Math.cos(angle) * speed;
+        const speedY = Math.sin(angle) * speed;
+
         const rotation = Math.random() * Math.PI * 2;
-        const rotationSpeed = (Math.random() - 0.5) * 0.2; // -0.1 to +0.1 radians per tick
+        const rotationSpeed = (Math.random() - 0.5) * 0.2;
 
         new component(
-            myGamePiece.width / 2, 8, // width, height
+            myGamePiece.width / 2, 8,
             "orange",
-            myGamePiece.x + myGamePiece.width / 4 + spread, // x with spread
-            myGamePiece.y + myGamePiece.height, // just below player
-            200, 400, // fade delay and fade time
+            baseX - myGamePiece.width / 4, // Center the particle
+            baseY,
+            200, 400,
             particleID,
             {
                 speedX: speedX,
