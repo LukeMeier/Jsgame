@@ -138,40 +138,32 @@ function updateGameArea() {
     myGamePiece.update();
 
     // --- Jetpack lean logic ---
-    // Target lean: -1 for moving right, 1 for moving left, 0 for idle
     let targetLean = 0;
     if (myGamePiece.speedX > 0) targetLean = -1;
     else if (myGamePiece.speedX < 0) targetLean = 1;
-    // Smoothly interpolate jetpackLean toward targetLean
     jetpackLean += (targetLean - jetpackLean) * jetpackLeanSpeed;
 
-    // Jetpack: spawn a particle under the player if flying up
+    // Jetpack: spawn a particle under the player if flying up and energy > 0
     if (lever2 && myGamePiece.energy > 0) {
         particleID++;
-
-        // Make emission point closer to the edge (80% of half-width)
-        const edgeOffset = (myGamePiece.width * 0.8 / 2) * jetpackLean; // -12 to +12 if width=30
+        // Emit almost from the edge (95% of half-width)
+        const edgeOffset = (myGamePiece.width * 0.95 / 2) * jetpackLean;
         const baseX = myGamePiece.x + myGamePiece.width / 2 + edgeOffset;
         const baseY = myGamePiece.y + myGamePiece.height;
-
-        // Increase spread angle to 80° for more sideways effect
-        const spreadAngle = (Math.PI / 2.25); // ~80°
-        const angleBase = Math.PI / 2 + jetpackLean * spreadAngle / 2; // Centered downward, shifted by lean
+        const spreadAngle = (Math.PI * 2 / 3); // 120°
+        const angleBase = Math.PI / 2 + jetpackLean * spreadAngle / 2;
         const angle = angleBase + (Math.random() - 0.5) * spreadAngle;
-
-        const speed = Math.random() * 1.5 + 1.2; // 1.2 to 2.7 px per tick
+        const speed = Math.random() * 2.5 + 2;
         const speedX = Math.cos(angle) * speed;
         const speedY = Math.sin(angle) * speed;
-
         const rotation = Math.random() * Math.PI * 2;
         const rotationSpeed = (Math.random() - 0.5) * 0.2;
-
         new component(
             myGamePiece.width / 2, 8,
             "orange",
-            baseX - myGamePiece.width / 4, // Center the particle
+            baseX - myGamePiece.width / 4,
             baseY,
-            200, 400,
+            600, 800,
             particleID,
             {
                 speedX: speedX,
@@ -182,6 +174,12 @@ function updateGameArea() {
         );
     }
 
+    // If energy is 0, force stop flying
+    if (myGamePiece.energy <= 0 && lever2) {
+        lever2 = false;
+        myGamePiece.gravity = 0.1;
+    }
+
     particles.forEach(particle => {
         particle.newPos();
         particle.update();
@@ -190,8 +188,11 @@ function updateGameArea() {
 
 var lever2 = false;
 function jump(){
-    lever2 = true;
-    myGamePiece.gravity = -0.1;
+    // Only allow flying if energy > 0
+    if (myGamePiece.energy > 0) {
+        lever2 = true;
+        myGamePiece.gravity = -0.1;
+    }
 }
 setInterval(energylosss, 200);
 setInterval(energygainn, 1000);
