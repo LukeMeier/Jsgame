@@ -29,7 +29,7 @@ var myGameArea = {
     }
 }
 
-function component(width, height, color, x, y, optionalFadeDelay, optionalFadeTime, particleID) {
+function component(width, height, color, x, y, optionalFadeDelay, optionalFadeTime, particleID, options) {
     this.id = particleID ?? 0;
     this.health = 100;
     this.energy = 10;
@@ -38,12 +38,14 @@ function component(width, height, color, x, y, optionalFadeDelay, optionalFadeTi
     this.height = height;
     this.x = x;
     this.y = y;
-    this.speedX = 0;
-    this.speedY = 0;
+    this.speedX = options?.speedX ?? 0;
+    this.speedY = options?.speedY ?? 0;
     this.gravity = 0.1;
     this.gravitySpeed = 0;
     this.seconds = 0;
     this.minuts = 0;
+    this.rotation = options?.rotation || 0;
+    this.rotationSpeed = options?.rotationSpeed || 0;
 
     if(optionalFadeDelay && optionalFadeTime) {
         setTimeout(() => {
@@ -68,13 +70,18 @@ function component(width, height, color, x, y, optionalFadeDelay, optionalFadeTi
 
     this.update = function() {
         ctx = myGameArea.context;
+        ctx.save();
+        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+        ctx.rotate(this.rotation);
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+        ctx.restore();
     }
     this.newPos = function() {
         this.gravitySpeed += this.gravity;
         this.x += this.speedX;
         this.y += this.speedY + this.gravitySpeed;
+        this.rotation += this.rotationSpeed;
         this.hitBottom();
     }
     this.hitBottom = function() {
@@ -129,14 +136,26 @@ function updateGameArea() {
     // Jetpack: spawn a particle under the player if flying up
     if (lever2 && myGamePiece.energy > 0) {
         particleID++;
-        // Spawn a small block under the player
+        // Randomize spread, speed, and rotation for fire effect
+        const spread = (Math.random() - 0.5) * myGamePiece.width * 0.8; // -12 to +12 if width=30
+        const speedX = (Math.random() - 0.5) * 2; // -1 to +1 px per tick
+        const speedY = Math.random() * 1.5 + 1; // 1 to 2.5 px per tick (downward)
+        const rotation = Math.random() * Math.PI * 2;
+        const rotationSpeed = (Math.random() - 0.5) * 0.2; // -0.1 to +0.1 radians per tick
+
         new component(
             myGamePiece.width / 2, 8, // width, height
             "orange",
-            myGamePiece.x + myGamePiece.width / 4, // center under player
+            myGamePiece.x + myGamePiece.width / 4 + spread, // x with spread
             myGamePiece.y + myGamePiece.height, // just below player
             200, 400, // fade delay and fade time
-            particleID
+            particleID,
+            {
+                speedX: speedX,
+                speedY: speedY,
+                rotation: rotation,
+                rotationSpeed: rotationSpeed
+            }
         );
     }
 
