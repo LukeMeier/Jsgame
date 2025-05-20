@@ -1,4 +1,3 @@
-
 var myGamePiece;
 var particles = [];
 var particleID = 0;
@@ -8,16 +7,7 @@ var number = Math.floor(Math.random()*colors.length)
 
 function startGame() {
     myGamePiece = new component(30, 30, "red", 80, 75);
-    var int = 1;
     myGameArea.start();
-    setInterval(() => {
-        setTimeout(() => {
-            int++;
-            if(int > 20) return;
-            particleID++;
-            new component(10, 10, "red", 80, 75, 5000, 1000, particleID); 
-        }, 10000);
-    }, 100);
 }
 
 console.log(particles)
@@ -44,7 +34,6 @@ function component(width, height, color, x, y, optionalFadeDelay, optionalFadeTi
     this.health = 100;
     this.energy = 10;
     this.color = color;
-    // this.type = type;
     this.width = width;
     this.height = height;
     this.x = x;
@@ -57,20 +46,16 @@ function component(width, height, color, x, y, optionalFadeDelay, optionalFadeTi
     this.minuts = 0;
 
     if(optionalFadeDelay && optionalFadeTime) {
-        // this.color = `rgba(249, 180, 45, 1)`;
         setTimeout(() => {
             var ticks = optionalFadeTime / 20;
             var doneTicks = 0;
             fade();
             function fade() {
                 setTimeout(() => {
-                    // this.color = `rgba(249, 180, 45, ${Math.abs(doneTicks / ticks - 1)})`;
                     doneTicks++;
                     if(doneTicks > ticks) {
                         if(particleID) {
-                            console.log(particles.filter(p => p.id === particleID)[0]);
                             particles.splice(particles.findIndex(p => p.id === particleID),1);
-                            console.log(particles.filter(p => p.id === particleID)[0]);
                         }
                     }
                     else {
@@ -83,8 +68,8 @@ function component(width, height, color, x, y, optionalFadeDelay, optionalFadeTi
 
     this.update = function() {
         ctx = myGameArea.context;
-        ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.width, this.height);
     }
     this.newPos = function() {
         this.gravitySpeed += this.gravity;
@@ -104,8 +89,6 @@ function component(width, height, color, x, y, optionalFadeDelay, optionalFadeTi
                     myGamePiece.health = 0;
                     location.reload();
                 }
-                console.log(myGamePiece.health)
-                console.log(datasave)
                 datasave = 0;
             }
         }
@@ -143,8 +126,21 @@ function updateGameArea() {
     myGamePiece.newPos();
     myGamePiece.update();
 
+    // Jetpack: spawn a particle under the player if flying up
+    if (lever2 && myGamePiece.energy > 0) {
+        particleID++;
+        // Spawn a small block under the player
+        new component(
+            myGamePiece.width / 2, 8, // width, height
+            "orange",
+            myGamePiece.x + myGamePiece.width / 4, // center under player
+            myGamePiece.y + myGamePiece.height, // just below player
+            200, 400, // fade delay and fade time
+            particleID
+        );
+    }
+
     particles.forEach(particle => {
-        console.log(particle)
         particle.newPos();
         particle.update();
     });
